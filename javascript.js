@@ -79,7 +79,7 @@ numberKeys.forEach((key) => {
         }
         if (display.textContent === "0") {
             display.textContent = key.textContent;
-        } else {
+        } else if (display.textContent.length < 10) {
             display.textContent += key.textContent;
         }
     });

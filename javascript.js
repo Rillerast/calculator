@@ -17,6 +17,10 @@ function divide(a , b) {
     return a / b;
 }
 
+function modulus(a, b) {
+    return a % b;
+}
+
 function operate(firstNumber, operand, secondNumber) {
     switch(operand) {
         case "+":
@@ -27,20 +31,18 @@ function operate(firstNumber, operand, secondNumber) {
             return multiply(firstNumber, secondNumber);
         case "/":
             return divide(firstNumber, secondNumber);
+        case "%":
+            return modulus(firstNumber, secondNumber);
     }
 }
 
 function roundDecimals(string) {
-
-    console.log(string);
 
     if (string.length > 9) {
 
         let dotPosition = 0;
     
         if (string.includes(".")) {
-    
-            console.log("is decimal")
             
             for (let i = 0; i < string.length; i++) {
                 if (string[i] == ".") {
@@ -50,8 +52,18 @@ function roundDecimals(string) {
             }
             
         }
-    
-        return parseFloat(string).toFixed(10 - dotPosition);
+        
+        let result = parseFloat(string).toFixed(10 - dotPosition);
+
+        // Result is still too long
+        if (result.length > 10) return NaN;
+
+        // A result with all zeros afther the comma so is equivalent to a integer
+        if (result[10 - dotPosition] === "0") {
+            return parseInt(result);
+        }
+
+        return result;
 
     }
 
@@ -69,6 +81,7 @@ const operatorKeys = document.querySelectorAll(".operator-key");
 const display = document.querySelector(".display");
 const clearButton = document.querySelector(".clear-button");
 const equalOperator = document.querySelector(".equal-operator");
+const deleteButton = document.querySelector(".delete-button");
 
 numberKeys.forEach((key) => {
     key.addEventListener("click", (event) => {
@@ -118,5 +131,19 @@ equalOperator.addEventListener("click", (event) => {
         }
         operand = "";
         editNumber = false;
+    }
+});
+
+deleteButton.addEventListener("click", (event) => {
+    let newDisplayContent = "";
+    if (display.textContent !== "0") {
+        for (let i = 0; i < display.textContent.length - 1; i++) {
+            newDisplayContent += display.textContent[i];
+        }
+        display.textContent = newDisplayContent;
+    }
+
+    if (display.textContent.length === 0) {
+        display.textContent = "0";
     }
 });

@@ -38,7 +38,7 @@ function operate(firstNumber, operand, secondNumber) {
 
 function roundDecimals(string) {
 
-    if (string.length > 9) {
+    if (string.length > 10) {
 
         let dotPosition = 0;
     
@@ -75,6 +75,7 @@ let secondNumber = 0;
 let operand = "";
 let editNumber = true;
 let consecutiveOperand = false;
+let decimalPlace = false;
 
 const numberKeys = document.querySelectorAll(".number-key");
 const operatorKeys = document.querySelectorAll(".operator-key");
@@ -82,6 +83,7 @@ const display = document.querySelector(".display");
 const clearButton = document.querySelector(".clear-button");
 const equalOperator = document.querySelector(".equal-operator");
 const deleteButton = document.querySelector(".delete-button");
+const decimalPlaceKeys = document.querySelectorAll(".decimal-key")
 
 numberKeys.forEach((key) => {
     key.addEventListener("click", (event) => {
@@ -100,16 +102,20 @@ numberKeys.forEach((key) => {
 
 operatorKeys.forEach((key) => {
     key.addEventListener("click", (event) => {
-        editNumber = false;
-        if (operand === "") {
-            firstNumber = parseFloat(display.textContent);
-            operand = key.textContent;
-            consecutiveOperand = true;
-        } else if (!consecutiveOperand) {
-            secondNumber = parseFloat(display.textContent);
-            display.textContent = roundDecimals(operate(firstNumber, operand, secondNumber).toString());
-            firstNumber = parseFloat(display.textContent);
-            operand = key.textContent;
+        // Do not operate if last character is the decimal place
+        if (display.textContent[display.textContent.length - 1] !== ".") {
+            editNumber = false;
+            decimalPlace = false;
+            if (operand === "") {
+                firstNumber = parseFloat(display.textContent);
+                operand = key.textContent;
+                consecutiveOperand = true;
+            } else if (!consecutiveOperand) {
+                secondNumber = parseFloat(display.textContent);
+                display.textContent = roundDecimals(operate(firstNumber, operand, secondNumber).toString());
+                firstNumber = parseFloat(display.textContent);
+                operand = key.textContent;
+            }
         }
     });
 });
@@ -119,18 +125,28 @@ clearButton.addEventListener("click", (event) => {
     secondNumber = 0;
     operand = "";
     display.textContent = "0";
+    decimalPlace = false;
 });
 
 equalOperator.addEventListener("click", (event) => {
-    if (operand !== "" && editNumber) {
-        secondNumber = parseFloat(display.textContent);
-        let result = operate(firstNumber, operand, secondNumber);
-        display.textContent = result;
-        if (display.textContent.length > 9) {
-            display.textContent = roundDecimals(display.textContent)
+    if (display.textContent.includes(".")) {
+        decimalPlace = false;
+    } else {
+        decimalPlace = true;
+    }
+
+    // Do not operate if last character is the decimal place
+    if (display.textContent[display.textContent.length - 1] !== ".") {
+        if (operand !== "" && editNumber) {
+            secondNumber = parseFloat(display.textContent);
+            let result = operate(firstNumber, operand, secondNumber);
+            display.textContent = result;
+            if (display.textContent.length > 9) {
+                display.textContent = roundDecimals(display.textContent)
+            }
+            operand = "";
+            editNumber = false;
         }
-        operand = "";
-        editNumber = false;
     }
 });
 
@@ -140,10 +156,24 @@ deleteButton.addEventListener("click", (event) => {
         for (let i = 0; i < display.textContent.length - 1; i++) {
             newDisplayContent += display.textContent[i];
         }
+        if (display.textContent[display.textContent.length - 1] === ".") {
+            console.log("removed .");
+            decimalPlace = false;
+        }
+
         display.textContent = newDisplayContent;
     }
 
     if (display.textContent.length === 0) {
         display.textContent = "0";
     }
+});
+
+decimalPlaceKeys.forEach((key) => {
+    key.addEventListener("click", (event) => {
+        if (!decimalPlace) {
+            display.textContent += ".";
+            decimalPlace = true;
+        }
+    });
 });

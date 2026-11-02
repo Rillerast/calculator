@@ -56,7 +56,7 @@ function roundDecimals(string) {
         let result = parseFloat(string).toFixed(10 - dotPosition);
 
         // Result is still too long
-        if (result.length > 10) return NaN;
+        if (result.length > 11) return NaN;
 
         // A result with all zeros afther the comma so is equivalent to a integer
         if (result[10 - dotPosition] === "0") {
